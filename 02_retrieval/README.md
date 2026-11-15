@@ -80,11 +80,49 @@ All three differences are real: every confidence interval is far above zero.
    on a 4-core laptop CPU, with all cores busy. The vectors are cached, so later runs take seconds.
    At that point the limit is the hardware: a GPU would do it in minutes.
 
+## Add-on: HNSW, speed vs accuracy
+
+Exact search compares the question with all 57,638 posts. **HNSW** (the index behind pgvector,
+FAISS, Qdrant and most vector databases) links each post to its nearest neighbours in a graph and
+walks that graph toward the question, comparing with only a few hundred posts. It is
+**approximate**: the walk can miss some of the true top 10. It never makes results more relevant
+than exact search; it makes them faster.
+
+[`hnsw.py`](hnsw.py) uses the same cached vectors with FAISS (`IndexHNSWFlat`, M = 32,
+efConstruction = 200), one question at a time on one CPU core. **efSearch** is how many candidates
+the walk keeps exploring: a dial between speed and accuracy that can be changed per query.
+**ANN recall@10** is the share of the exact top 10 that HNSW also returns.
+
+| Search | ANN recall@10 | nDCG@10 | ms / question | Speed-up |
+|---|---|---|---|---|
+| Exact | 1.000 | 0.403 | 5.60 | 1× |
+| HNSW ef=8 | 0.758 | 0.352 | 0.07 | 75× |
+| HNSW ef=16 | 0.875 | 0.384 | 0.09 | 64× |
+| HNSW ef=32 | 0.940 | 0.393 | 0.15 | 38× |
+| **HNSW ef=64** | **0.975** | **0.396** | **0.25** | **23×** |
+| HNSW ef=128 | 0.990 | 0.400 | 0.44 | 13× |
+| HNSW ef=256 | 0.996 | 0.402 | 0.81 | 7× |
+
+Building the graph took 33 s, once. Exact search time grows in line with the collection: 5.5 ms at
+57k posts, 11 ms at 115k, 22 ms at 231k, 43 ms at 461k (timed on copies of the data), so about
+1 second per question at 10 million. HNSW grows roughly with the logarithm of the size.
+
+**What I learned**
+
+1. **HNSW approaches exact search but never beats it** (nDCG 0.352 → 0.402, vs 0.403 exact).
+2. **ef = 64 is the sweet spot here:** 97.5% of the exact top 10, −0.007 nDCG, 23× faster.
+3. **A too-small ef silently hurts quality.** At ef = 8, nDCG drops by 0.05, about as much as
+   switching to a much weaker embedding model. pgvector's default `hnsw.ef_search` is 40, so it is
+   worth measuring ANN recall instead of trusting defaults.
+4. **Under about 100k documents, exact search is fast enough** (single-digit ms). The index pays
+   off from a few hundred thousand documents upward.
+
 ## Run it
 
 ```bash
 uv sync
-uv run python 02_retrieval/run.py
+uv run python 02_retrieval/run.py    # BM25 vs dense
+uv run python 02_retrieval/hnsw.py   # HNSW vs exact (needs the vectors cached by run.py)
 ```
 
 The first run embeds all posts (about 50 minutes on a laptop CPU) and caches them in
