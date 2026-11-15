@@ -13,8 +13,8 @@ question -> [embed] -> [retrieve] -> [rerank] -> [generate] -> [judge]
 | [01](01_embeddings/) | Embeddings | Do embedding models capture meaning the way humans do? | STS-B | done |
 | [02](02_retrieval/) | Retrieval | Keyword (BM25) vs dense search: where does each fail? | BEIR FiQA | done |
 | [03](03_chunking/) | Chunking | How does chunk size change retrieval? | SQuAD | done |
-| 04 | Reranking | How much does a cross-encoder add, at what latency? | BEIR FiQA | next |
-| 05 | Generation | Does the LLM answer correctly and return valid JSON? | SQuAD | planned |
+| [04](04_reranking/) | Reranking | How much does a cross-encoder add, at what latency? | BEIR FiQA | done |
+| 05 | Generation | Does the LLM answer correctly and return valid JSON? | SQuAD | next |
 | 06 | LLM-as-judge | Does an LLM judge agree with human experts? | MT-Bench human judgments | planned |
 
 **Headlines so far**
@@ -27,6 +27,9 @@ question -> [embed] -> [retrieve] -> [rerank] -> [generate] -> [judge]
 - **03:** at a fixed context budget, paragraph and small chunks win; 400-word chunks collapse for
   dense search because half of them exceed the model's 512-token limit. Comparing chunk sizes at a
   fixed top-k is misleading.
+- **04:** standard MS MARCO cross-encoders did *not* improve dense search on finance questions
+  (−0.018 nDCG at depth 30) while adding 0.5 to 4.4 s per question on CPU. The same reranker lifts
+  BM25 by +0.077, so a reranker only helps when it is a better judge than the retriever.
 
 ## Principles
 
