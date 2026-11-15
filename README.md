@@ -15,7 +15,7 @@ question -> [embed] -> [retrieve] -> [rerank] -> [generate] -> [judge]
 | [03](03_chunking/) | Chunking | How does chunk size change retrieval? | SQuAD | done |
 | [04](04_reranking/) | Reranking | How much does a cross-encoder add, at what latency? | BEIR FiQA | done |
 | [05](05_generation/) | Generation | Does the LLM answer correctly and return valid JSON? | SQuAD | done |
-| 06 | LLM-as-judge | Does an LLM judge agree with human experts? | MT-Bench human judgments | next |
+| [06](06_judge/) | LLM-as-judge | Does an LLM judge agree with human experts? | MT-Bench human judgments | done |
 
 **Headlines so far**
 
@@ -33,6 +33,10 @@ question -> [embed] -> [retrieve] -> [rerank] -> [generate] -> [judge]
 - **05:** gpt-oss returned valid JSON 480 of 480 times. Given the right paragraph it answers 92%
   exactly; through real retrieval, 75%. With the answer removed it invented one anyway 15 to 25% of
   the time, using real names and numbers from the wrong part of the context.
+- **06:** a free Gemini Flash Lite judge agrees with MT-Bench experts 61% of the time (experts agree
+  with each other 64%, GPT-4 with them 67%), but every judge flips its verdict on 16 to 33% of pairs
+  when only the answer order changes. Re-grading 05 with it by meaning instead of spelling lifts
+  gpt-oss-120b from 75% to 88% through real retrieval.
 
 ## Principles
 

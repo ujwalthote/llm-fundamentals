@@ -3,4 +3,4 @@ __pycache__/
 .ruff_cache/
 .env
 cache/
-run_log.txt
+run_log*.txt
