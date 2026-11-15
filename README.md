@@ -44,6 +44,13 @@ question -> [embed] -> [retrieve] -> [rerank] -> [generate] -> [judge]
 - **Readable:** one short script per experiment, top to bottom.
 - **Honest numbers:** fixed samples, cached results, and paired bootstrap confidence intervals.
 
+## How this was built
+
+Step by step with [Claude Code](https://claude.com/claude-code) as a pair programmer. Each
+experiment was worked through with small examples first, then run, checked against published
+results where they exist, and reviewed before it was committed. Commits carry a co-author line to
+show this.
+
 ## Setup
 
 ```bash
