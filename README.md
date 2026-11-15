@@ -12,8 +12,8 @@ question -> [embed] -> [retrieve] -> [rerank] -> [generate] -> [judge]
 |---|---|---|---|---|
 | [01](01_embeddings/) | Embeddings | Do embedding models capture meaning the way humans do? | STS-B | done |
 | [02](02_retrieval/) | Retrieval | Keyword (BM25) vs dense search: where does each fail? | BEIR FiQA | done |
-| 03 | Chunking | How does chunk size change retrieval? | SQuAD | next |
-| 04 | Reranking | How much does a cross-encoder add, at what latency? | BEIR FiQA | planned |
+| [03](03_chunking/) | Chunking | How does chunk size change retrieval? | SQuAD | done |
+| 04 | Reranking | How much does a cross-encoder add, at what latency? | BEIR FiQA | next |
 | 05 | Generation | Does the LLM answer correctly and return valid JSON? | SQuAD | planned |
 | 06 | LLM-as-judge | Does an LLM judge agree with human experts? | MT-Bench human judgments | planned |
 
@@ -23,6 +23,10 @@ question -> [embed] -> [retrieve] -> [rerank] -> [generate] -> [judge]
   quality, and above 110M parameters the models are statistically tied.
 - **02:** dense search beats BM25 by +0.19 nDCG@10 on finance questions (matching the published
   score exactly), but BM25 still solves 25 questions that dense misses, and 29% are missed by both.
+  HNSW at ef=64 keeps 97.5% of the exact top 10 at 23× the speed.
+- **03:** at a fixed context budget, paragraph and small chunks win; 400-word chunks collapse for
+  dense search because half of them exceed the model's 512-token limit. Comparing chunk sizes at a
+  fixed top-k is misleading.
 
 ## Principles
 
